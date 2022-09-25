@@ -1,0 +1,10 @@
+not weighted not oriented
+Alex: Vladimir, Artem, Michael, Varya
+Andrew: Artem, Nikita, Michael
+Artem: Michael, Alex, Nikita, Andrew
+Danil: Vladimir, Michael, Liza
+Liza: Michael, Varya, Danil
+Michael: Danil, Alex, Artem, Liza, Vladimir, Varya, Nikita, Andrew
+Nikita: Michael, Varya, Andrew, Artem
+Varya: Michael, Vladimir, Alex, Nikita, Liza
+Vladimir: Alex, Michael, Varya, Danil

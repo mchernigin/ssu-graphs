@@ -1,0 +1,9 @@
+not weighted oriented
+chernigin.com: 
+code.visualstudio.com: microsoft.com, github.com, vscode.dev
+dsc.sgu.ru: python.org, github.com, vscode.dev, code.visualstudio.com
+github.com: chernigin.com, microsoft.com
+microsoft.com: 
+python.org: 
+vk.com: chernigin.com, github.com, dsc.sgu.ru
+vscode.dev: 

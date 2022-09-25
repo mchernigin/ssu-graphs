@@ -1,0 +1,8 @@
+weighted not oriented
+Cafe: Office(80), Park(15), University(35), Home(50), Seafront(40), Shop(50)
+Home: Seafront(20), University(70), Office(80), Park(45), Cafe(50), Shop(10)
+Office: Park(10), Home(80), Cafe(80), Shop(80), Seafront(70), University(25)
+Park: Cafe(15), Shop(45), University(20), Home(45), Office(10), Seafront(30)
+Seafront: Office(70), Home(20), Park(30), University(50), Cafe(40), Shop(20)
+Shop: Park(45), University(70), Seafront(20), Cafe(50), Office(80), Home(10)
+University: Park(20), Home(70), Office(25), Cafe(35), Shop(70), Seafront(50)
