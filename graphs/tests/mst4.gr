@@ -1,0 +1,6 @@
+weighted not oriented
+a: e(1), b(3)
+e: c(6), d(7), b(4), a(1)
+b: c(5), e(4), a(3)
+c: d(2), e(6), b(5)
+d: e(7), c(2)
