@@ -1,12 +1,15 @@
 use graphs_at_ssu::*;
 use inquire::{error::InquireResult, Confirm, CustomType, CustomUserError, Select, Text};
 use std::process;
+mod tasks;
 
 fn main() -> InquireResult<()> {
-    let tasks = vec![
-        "Find MST using Kruskal algorithm",
-        "Find MST using Prim algorithm",
-    ];
+    const TASK1A1: &str = "Ia. Find nodes which are adjacent from u, but aren't from v";
+    const TASK1A2: &str = "Ia. Find nodes which are adjacent from u and v";
+    const TASK3KRUSKAL: &str = "III. Find MST using Kruskal algorithm";
+    const TASK3PRIM: &str = "III. Find MST using Prim algorithm";
+
+    let tasks = vec![TASK1A1, TASK1A2, TASK3KRUSKAL, TASK3PRIM];
 
     print!("\x1B[2J\x1B[1;1H"); // clear the console
     let graph_creation_ans = or_err!(Select::new(
@@ -103,7 +106,8 @@ fn main() -> InquireResult<()> {
                 }
             }
             "Tasks..." => {
-                let mst_with = |f: &dyn Fn(&Graph) -> GraphResult<Vec<EdgeWeighted>>| match f(&gr) {
+                // TODO: Convert closures into macros
+                let task3 = |f: &dyn Fn(&Graph) -> GraphResult<Vec<EdgeWeighted>>| match f(&gr) {
                     Ok(mst) => {
                         print!(
                             "\n{}\n",
@@ -115,9 +119,37 @@ fn main() -> InquireResult<()> {
                     }
                     Err(e) => safe_err!("Cannot find MST: {e}"),
                 };
+                let task1 = |f: &dyn Fn(&Graph, String, String) -> GraphResult<Vec<String>>,
+                             u,
+                             v| match f(&gr, u, v) {
+                    Ok(v) => print!(
+                        "\n{}\n",
+                        if v.len() > 0 {
+                            v.iter()
+                                .map(|t| format!("{t:?}"))
+                                .collect::<Vec<String>>()
+                                .join(", ")
+                        } else {
+                            "There is no such nodes!".into()
+                        }
+                    ),
+                    Err(e) => safe_err!("{}", e),
+                };
                 match or_escape!(Select::new("Select task:", tasks.clone()).prompt()) {
-                    "Find MST using Kruskal algorithm" => mst_with(&algorithms::mst::kruskal),
-                    "Find MST using Prim algorithm" => mst_with(&algorithms::mst::prim),
+                    TASK3KRUSKAL => task3(&algorithms::mst::kruskal),
+                    TASK3PRIM => task3(&algorithms::mst::prim),
+                    TASK1A1 => {
+                        let nodes = gr.get_nodes();
+                        let u = or_escape!(Select::new("Select node u:", nodes.clone()).prompt());
+                        let v = or_escape!(Select::new("Select node v:", nodes).prompt());
+                        task1(&tasks::solve1a1, u, v);
+                    }
+                    TASK1A2 => {
+                        let nodes = gr.get_nodes();
+                        let u = or_escape!(Select::new("Select node u:", nodes.clone()).prompt());
+                        let v = or_escape!(Select::new("Select node v:", nodes).prompt());
+                        task1(&tasks::solve1a2, u, v);
+                    }
                     _ => safe_err!("Unknown algorithm"),
                 }
             }
