@@ -6,10 +6,11 @@ mod tasks;
 fn main() -> InquireResult<()> {
     const TASK1A1: &str = "Ia. Find nodes which are adjacent from u, but aren't from v";
     const TASK1A2: &str = "Ia. Find nodes which are adjacent from u and v";
+    const TASK1B: &str = "Ib. Inverse oriented graph";
     const TASK3KRUSKAL: &str = "III. Find MST using Kruskal algorithm";
     const TASK3PRIM: &str = "III. Find MST using Prim algorithm";
 
-    let tasks = vec![TASK1A1, TASK1A2, TASK3KRUSKAL, TASK3PRIM];
+    let tasks = vec![TASK1A1, TASK1A2, TASK1B, TASK3KRUSKAL, TASK3PRIM];
 
     print!("\x1B[2J\x1B[1;1H"); // clear the console
     let graph_creation_ans = or_err!(Select::new(
@@ -149,6 +150,13 @@ fn main() -> InquireResult<()> {
                         let u = or_escape!(Select::new("Select node u:", nodes.clone()).prompt());
                         let v = or_escape!(Select::new("Select node v:", nodes).prompt());
                         task1(&tasks::solve1a2, u, v);
+                    }
+                    TASK1B => {
+                        match tasks::solve1b(&gr) {
+                            Ok(new_gr) => gr = new_gr,
+                            Err(e) => safe_err!("{}", e),
+                        };
+                        print!("\nGraph has been inverted!\n")
                     }
                     _ => safe_err!("Unknown algorithm"),
                 }

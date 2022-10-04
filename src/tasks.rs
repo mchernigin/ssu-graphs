@@ -39,3 +39,22 @@ fn check_if_contains(gr: &Graph, u: &String, v: &String) -> GraphResult<()> {
 
     Ok(())
 }
+
+pub fn solve1b(gr: &Graph) -> GraphResult<Graph> {
+    if !gr.is_oriented() {
+        return Err(GraphError {
+            msg: "Graph has to be not oriented".to_string(),
+        });
+    }
+
+    let mut inverted_gr = Graph::new(gr.is_weighted(), gr.is_oriented());
+
+    for node in gr.get_nodes() {
+        inverted_gr.push_node(node)?;
+    }
+    for edge in gr.get_edges() {
+        inverted_gr.push_edge(edge.1, edge.0, edge.2)?;
+    }
+
+    Ok(inverted_gr)
+}
