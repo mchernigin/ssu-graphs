@@ -9,9 +9,18 @@ fn main() -> InquireResult<()> {
     const TASK1B: &str = "Ib. Inverse oriented graph";
     const TASK3KRUSKAL: &str = "III. Find MST using Kruskal algorithm";
     const TASK3PRIM: &str = "III. Find MST using Prim algorithm";
+    const HELPER_DFS: &str = "Get DFS from certain node";
+    const HELPER_BFS: &str = "Get BFS from certain node";
 
-    let tasks = vec![TASK1A1, TASK1A2, TASK1B, TASK3KRUSKAL, TASK3PRIM];
-
+    let tasks = vec![
+        TASK1A1,
+        TASK1A2,
+        TASK1B,
+        TASK3KRUSKAL,
+        TASK3PRIM,
+        HELPER_DFS,
+        HELPER_BFS,
+    ];
     print!("\x1B[2J\x1B[1;1H"); // clear the console
     let graph_creation_ans = or_err!(Select::new(
         "What do you want to start with?",
@@ -157,6 +166,14 @@ fn main() -> InquireResult<()> {
                             Err(e) => safe_err!("{}", e),
                         };
                         print!("\nGraph has been inverted!\n")
+                    }
+                    HELPER_DFS => {
+                        let s = or_escape!(Select::new("Where to start:", gr.get_nodes()).prompt());
+                        print!("\n{:?}\n", algorithms::traversals::dfs(&gr, s));
+                    }
+                    HELPER_BFS => {
+                        let s = or_escape!(Select::new("Where to start:", gr.get_nodes()).prompt());
+                        print!("\n{:?}\n", algorithms::traversals::bfs(&gr, s));
                     }
                     _ => safe_err!("Unknown algorithm"),
                 }

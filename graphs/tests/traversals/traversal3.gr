@@ -1,0 +1,11 @@
+not weighted not oriented
+A: B, C, D
+B: A, E, F
+C: A, G, H
+D: A, J, K
+E: B, F
+F: B, E, G
+G: C, F, H
+H: C, G, J
+J: D, H, K
+K: D, J

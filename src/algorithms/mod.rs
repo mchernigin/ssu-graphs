@@ -1,3 +1,3 @@
 pub mod mst;
+pub mod traversals;
 
-pub use mst::*;
