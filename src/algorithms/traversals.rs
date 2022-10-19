@@ -1,6 +1,6 @@
 use crate::*;
 
-// Get vector of nodes in DFS (Depth-First Search) order.
+/// Get vector of nodes in DFS (Depth-First Search) order.
 pub fn dfs(gr: &Graph, start: String) -> Vec<String> {
     fn dfs_inner(
         al: &HashMap<String, HashMap<String, Option<EdgeWeight>>>,
@@ -28,7 +28,7 @@ pub fn dfs(gr: &Graph, start: String) -> Vec<String> {
     dfs_inner(&gr.get_adjacency_list(), &mut visited, &mut path, &start)
 }
 
-// Get vector of nodes in BFS (Breadth-First Search) order.
+/// Get vector of nodes in BFS (Breadth-First Search) order.
 pub fn bfs(gr: &Graph, start: String) -> Vec<String> {
     fn bfs_inner(
         al: &HashMap<String, HashMap<String, Option<EdgeWeight>>>,

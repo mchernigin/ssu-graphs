@@ -22,7 +22,7 @@ macro_rules! or_err {
         match $res {
             Ok(val) => val,
             Err(e) => {
-                safe_err!("{e}\n");
+                safe_err!("{e}");
                 process::exit(1);
             }
         }
@@ -179,11 +179,14 @@ impl Graph {
             adjacency_list.insert(node_name.to_string(), connections);
         }
 
-        Ok(Self {
+        let gr = Self {
             adjacency_list,
             is_weighted,
             is_oriented,
-        })
+        };
+        gr.validate()?;
+
+        Ok(gr)
     }
 
     /// Save graph to file.
@@ -220,6 +223,63 @@ impl Graph {
         }
 
         al
+    }
+
+    /// Checks if graph is valid or not
+    fn validate(&self) -> GraphResult<()> {
+        // Check that all nodes in right exists
+        for (key, connections) in &self.adjacency_list {
+            for node in connections.keys() {
+                if !self.adjacency_list.contains_key(node) {
+                    let mut msg = format!("{key:?} connects with not existing node {node:?}");
+                    if node.contains(' ') {
+                        msg.push_str(": Maybe missing a comma?");
+                    }
+                    return Err(GraphError { msg });
+                }
+            }
+        }
+
+        // Check if not oriented
+        if self.is_oriented {
+            return Ok(());
+        }
+        for (key, connections) in &self.adjacency_list {
+            for node in connections.keys() {
+                if !self.adjacency_list[node].contains_key(key)
+                    || self.adjacency_list[node][key] != self.adjacency_list[key][node]
+                {
+                    return Err(GraphError {
+                        msg: format!(
+                            "Graph is not oriented, but connection between \
+                             {key:?} and {node:?} is not symmetric"
+                        ),
+                    });
+                }
+            }
+        }
+        // Check for propper weights
+        for (key, connections) in &self.adjacency_list {
+            for (node, weight) in connections {
+                if self.is_weighted && weight.is_none() {
+                    return Err(GraphError {
+                        msg: format!(
+                            "Graph is weighted, but weight of connection between \
+                             {key:?} and {node:?} is `None`"
+                        ),
+                    });
+                } else if !self.is_weighted && weight.is_some() {
+                    return Err(GraphError {
+                        msg: format!(
+                            "Graph is not weighted, but weight of connection between \
+                            {key:?} and {node:?} was specified"
+                        ),
+                    });
+                }
+            }
+        }
+
+        Ok(())
     }
 
     /// Get a vec of all nodes stored in graph.
