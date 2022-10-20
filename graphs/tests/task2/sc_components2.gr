@@ -1,0 +1,8 @@
+not weighted oriented
+A: B
+B: C
+C: D
+D: E, F
+E: A
+F: 
+G: E

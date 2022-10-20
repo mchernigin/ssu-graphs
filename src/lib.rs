@@ -4,6 +4,7 @@ use std::fs::File;
 use std::io::{prelude::*, BufReader};
 
 pub mod algorithms;
+pub mod tasks;
 
 /// Print an error message to the terminal without exiting the program.
 #[macro_export]
@@ -384,7 +385,7 @@ impl Graph {
         Ok(())
     }
 
-    // Remove an edge from graph.
+    /// Remove an edge from graph.
     pub fn pop_edge(&mut self, node1: String, node2: String) -> GraphResult<Option<EdgeWeight>> {
         if !self.adjacency_list.contains_key(&node2) {
             return Err(GraphError {
