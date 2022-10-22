@@ -2,7 +2,7 @@ use crate::*;
 
 use std::collections::HashSet;
 
-pub fn kruskal(gr: &Graph) -> Result<Vec<(String, String, EdgeWeight)>, GraphError> {
+pub fn kruskal(gr: &Graph) -> GraphResult<Vec<(String, String, EdgeWeight)>> {
     check_if_applicable(gr)?;
 
     let mut edges: Vec<(String, String, EdgeWeight)> = gr
@@ -35,7 +35,7 @@ pub fn kruskal(gr: &Graph) -> Result<Vec<(String, String, EdgeWeight)>, GraphErr
     Ok(mst)
 }
 
-pub fn prim(gr: &Graph) -> Result<Vec<(String, String, EdgeWeight)>, GraphError> {
+pub fn prim(gr: &Graph) -> GraphResult<Vec<(String, String, EdgeWeight)>> {
     check_if_applicable(gr)?;
 
     let mut mst = Vec::<(String, String, EdgeWeight)>::new();
@@ -69,7 +69,7 @@ pub fn prim(gr: &Graph) -> Result<Vec<(String, String, EdgeWeight)>, GraphError>
                 next_connection = Some(edge.to_owned());
             }
         }
-        let next_connection = next_connection.ok_or(GraphError {
+        let next_connection = next_connection.ok_or_else(|| GraphError {
             msg: "Found isolated node!".to_string(),
         })?;
         let new_node = next_connection.1.clone();
@@ -91,7 +91,7 @@ pub fn prim(gr: &Graph) -> Result<Vec<(String, String, EdgeWeight)>, GraphError>
     Ok(mst)
 }
 
-fn check_if_applicable(gr: &Graph) -> Result<(), GraphError> {
+fn check_if_applicable(gr: &Graph) -> GraphResult<()> {
     if !gr.is_weighted() {
         Err(GraphError {
             msg: "Graph has to be weighted".to_string(),

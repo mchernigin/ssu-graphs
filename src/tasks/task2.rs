@@ -9,7 +9,7 @@ pub fn solve21(gr: &Graph) -> GraphResult<HashSet<BTreeSet<String>>> {
             msg: "Graph has to be oriented".to_string(),
         });
     }
-    
+
     fn find_component(
         al: &HashMap<String, HashMap<String, Option<EdgeWeight>>>,
         lead: &String,
@@ -18,30 +18,32 @@ pub fn solve21(gr: &Graph) -> GraphResult<HashSet<BTreeSet<String>>> {
         cur_node: &String,
     ) -> BTreeSet<String> {
         visited.insert(cur_node.to_string());
+        if component.is_empty() {
+            component.insert(cur_node.to_string());
+        }
         
-        let mut connections: Vec<String> = al[cur_node].iter().map(|(k, _)| k.to_owned()).collect();
+        let mut connections = al[cur_node].iter().map(|(k, _)| k.to_string()).collect::<Vec<_>>();
         connections.sort();
-        
+
         for node in &connections {
-            if !visited.contains(node) {
+            if !visited.contains(node) && node != cur_node {
                 find_component(al, lead, component, visited, node);
             }
-            if node == lead {
+            if node == lead && cur_node != lead {
                 component.extend(visited.iter().cloned());
             }
         }
-        
+
         component.to_owned()
     }
-    
-    let al = gr.get_adjacency_list();
+
     let mut components = HashSet::<BTreeSet<String>>::new();
     let mut used_nodes = HashSet::<String>::new();
-    
+
     for lead in gr.get_nodes() {
         if !used_nodes.contains(&lead) {
             let component = find_component(
-                &al,
+                &gr.get_adjacency_list(),
                 &lead,
                 &mut BTreeSet::<String>::new(),
                 &mut HashSet::<String>::new(),
@@ -51,6 +53,6 @@ pub fn solve21(gr: &Graph) -> GraphResult<HashSet<BTreeSet<String>>> {
             used_nodes.extend(component);
         }
     }
-    
+
     Ok(components)
 }

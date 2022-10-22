@@ -155,7 +155,7 @@ impl Graph {
             HashMap::new();
         for line in buf_reader.lines() {
             let line = line?;
-            let (node_name, connections_str) = line.split_once(':').ok_or(GraphError {
+            let (node_name, connections_str) = line.split_once(':').ok_or_else(|| GraphError {
                 msg: "Invalid syntax".to_string(),
             })?;
 
@@ -170,7 +170,7 @@ impl Graph {
                     continue;
                 }
 
-                let (con_node, rest) = c.split_once('(').ok_or(GraphError {
+                let (con_node, rest) = c.split_once('(').ok_or_else(|| GraphError {
                     msg: "Weight of connection was not provided in weighted graph".to_string(),
                 })?;
 
@@ -309,24 +309,22 @@ impl Graph {
 
     /// Add new node to the graph.
     pub fn push_node(&mut self, name: String) -> GraphResult<String> {
-        if self
-            .adjacency_list
-            .insert(name.clone(), HashMap::new())
-            .is_some()
-        {
-            Err(GraphError {
+        match self.adjacency_list.insert(name.clone(), HashMap::new()) {
+            Some(_) => Err(GraphError {
                 msg: format!("Node {name:?} already exists"),
-            })
-        } else {
-            Ok(name)
+            }),
+            None => Ok(name),
         }
     }
 
     /// Remove node from the graph.
     pub fn pop_node(&mut self, node: String) -> GraphResult<HashMap<String, Option<EdgeWeight>>> {
-        let rv = self.adjacency_list.remove(&node).ok_or(GraphError {
-            msg: format!("Node {node:?} does not exist"),
-        })?;
+        let rv = self
+            .adjacency_list
+            .remove(&node)
+            .ok_or_else(|| GraphError {
+                msg: format!("Node {node:?} does not exist"),
+            })?;
 
         let mut dead_connections: Vec<String> = Vec::new();
         for (it_node, connections) in &self.adjacency_list {
@@ -365,9 +363,12 @@ impl Graph {
             });
         }
 
-        let node1_connections = self.adjacency_list.get_mut(&node1).ok_or(GraphError {
-            msg: format!("Node {node1:?} does not exist"),
-        })?;
+        let node1_connections = self
+            .adjacency_list
+            .get_mut(&node1)
+            .ok_or_else(|| GraphError {
+                msg: format!("Node {node1:?} does not exist"),
+            })?;
 
         if node1_connections.insert(node2.clone(), weight).is_some() {
             return Err(GraphError {
@@ -393,11 +394,11 @@ impl Graph {
             });
         }
 
-        let node1_connection = self.adjacency_list.get_mut(&node1).ok_or(GraphError {
+        let node1_connection = self.adjacency_list.get_mut(&node1).ok_or_else(|| GraphError {
             msg: format!("Node {node1:?} does not exist"),
         })?;
 
-        let rv = node1_connection.remove(&node2).ok_or(GraphError {
+        let rv = node1_connection.remove(&node2).ok_or_else(|| GraphError {
             msg: "There is no such connection".to_string(),
         })?;
 

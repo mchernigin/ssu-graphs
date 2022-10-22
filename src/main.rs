@@ -144,7 +144,7 @@ fn main() -> InquireResult<()> {
                             "There is no such nodes!".into()
                         }
                     ),
-                    Err(e) => safe_err!("{}", e),
+                    Err(e) => safe_err!("{e}"),
                 };
                 match or_escape!(Select::new("Select task:", tasks.clone()).prompt()) {
                     TASK3KRUSKAL => task3(&algorithms::mst::kruskal),

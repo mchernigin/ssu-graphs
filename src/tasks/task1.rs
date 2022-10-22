@@ -47,7 +47,7 @@ pub fn solve1b(gr: &Graph) -> GraphResult<Graph> {
             msg: "Graph has to be not oriented".to_string(),
         });
     }
-    
+
     let mut inverted_gr = Graph::new(gr.is_weighted(), gr.is_oriented());
     
     for node in gr.get_nodes() {
