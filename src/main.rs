@@ -179,7 +179,17 @@ fn main() -> InquireResult<()> {
                     TASK22 => {
                         let s = or_escape!(Select::new("From where:", gr.get_nodes()).prompt());
                         let paths = tasks::task2::solve22(&gr, s);
-                        print!("\n{paths:?}\n");
+                        let mut paths = paths.iter().collect::<Vec<_>>();
+                        paths.sort_unstable();
+                        println!();
+                        for (to, path) in paths {
+                            print!("{to}: ");
+                            if path.is_empty() {
+                                println!("Unreachable");
+                            } else {
+                                println!("{path:?}");
+                            }
+                        }
                     }
                     HELPER_DFS => {
                         let s = or_escape!(Select::new("Where to start:", gr.get_nodes()).prompt());
