@@ -1,17 +1,29 @@
 use graphs_at_ssu::*;
 use inquire::{error::InquireResult, Confirm, CustomType, CustomUserError, Select, Text};
 use std::process;
-mod tasks;
 
 fn main() -> InquireResult<()> {
     const TASK1A1: &str = "Ia. Find nodes which are adjacent from u, but aren't from v";
     const TASK1A2: &str = "Ia. Find nodes which are adjacent from u and v";
     const TASK1B: &str = "Ib. Inverse oriented graph";
+    const TASK21: &str = "II. Find strongly connected component in oriented graph";
+    const TASK22: &str = "II. Find shortest path from given node to others";
     const TASK3KRUSKAL: &str = "III. Find MST using Kruskal algorithm";
     const TASK3PRIM: &str = "III. Find MST using Prim algorithm";
+    const HELPER_DFS: &str = "Get DFS from certain node";
+    const HELPER_BFS: &str = "Get BFS from certain node";
 
-    let tasks = vec![TASK1A1, TASK1A2, TASK1B, TASK3KRUSKAL, TASK3PRIM];
-
+    let tasks = vec![
+        TASK1A1,
+        TASK1A2,
+        TASK1B,
+        TASK21,
+        TASK22,
+        TASK3KRUSKAL,
+        TASK3PRIM,
+        HELPER_DFS,
+        HELPER_BFS,
+    ];
     print!("\x1B[2J\x1B[1;1H"); // clear the console
     let graph_creation_ans = or_err!(Select::new(
         "What do you want to start with?",
@@ -134,7 +146,7 @@ fn main() -> InquireResult<()> {
                             "There is no such nodes!".into()
                         }
                     ),
-                    Err(e) => safe_err!("{}", e),
+                    Err(e) => safe_err!("{e}"),
                 };
                 match or_escape!(Select::new("Select task:", tasks.clone()).prompt()) {
                     TASK3KRUSKAL => task3(&algorithms::mst::kruskal),
@@ -143,20 +155,49 @@ fn main() -> InquireResult<()> {
                         let nodes = gr.get_nodes();
                         let u = or_escape!(Select::new("Select node u:", nodes.clone()).prompt());
                         let v = or_escape!(Select::new("Select node v:", nodes).prompt());
-                        task1(&tasks::solve1a1, u, v);
+                        task1(&tasks::task1::solve1a1, u, v);
                     }
                     TASK1A2 => {
                         let nodes = gr.get_nodes();
                         let u = or_escape!(Select::new("Select node u:", nodes.clone()).prompt());
                         let v = or_escape!(Select::new("Select node v:", nodes).prompt());
-                        task1(&tasks::solve1a2, u, v);
+                        task1(&tasks::task1::solve1a2, u, v);
                     }
                     TASK1B => {
-                        match tasks::solve1b(&gr) {
+                        match tasks::task1::solve1b(&gr) {
                             Ok(new_gr) => gr = new_gr,
                             Err(e) => safe_err!("{}", e),
                         };
                         print!("\nGraph has been inverted!\n")
+                    }
+                    TASK21 => match tasks::task2::solve21(&gr) {
+                        Ok(c) => {
+                            print!("\n{:?}\n", c)
+                        }
+                        Err(e) => safe_err!("{}", e),
+                    },
+                    TASK22 => {
+                        let s = or_escape!(Select::new("From where:", gr.get_nodes()).prompt());
+                        let paths = tasks::task2::solve22(&gr, s);
+                        let mut paths = paths.iter().collect::<Vec<_>>();
+                        paths.sort_unstable();
+                        println!();
+                        for (to, path) in paths {
+                            print!("{to}: ");
+                            if path.is_empty() {
+                                println!("Unreachable");
+                            } else {
+                                println!("{path:?}");
+                            }
+                        }
+                    }
+                    HELPER_DFS => {
+                        let s = or_escape!(Select::new("Where to start:", gr.get_nodes()).prompt());
+                        print!("\n{:?}\n", algorithms::traversals::dfs(&gr, s));
+                    }
+                    HELPER_BFS => {
+                        let s = or_escape!(Select::new("Where to start:", gr.get_nodes()).prompt());
+                        print!("\n{:?}\n", algorithms::traversals::bfs(&gr, s));
                     }
                     _ => safe_err!("Unknown algorithm"),
                 }

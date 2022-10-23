@@ -2,23 +2,23 @@ use crate::*;
 
 use std::collections::HashSet;
 
-pub fn kruskal(gr: &Graph) -> Result<Vec<(String, String, EdgeWeight)>, GraphError> {
+pub fn kruskal(gr: &Graph) -> GraphResult<Vec<EdgeWeighted>> {
     check_if_applicable(gr)?;
 
-    let mut edges: Vec<(String, String, EdgeWeight)> = gr
+    let mut edges = gr
         .get_edges()
         .iter()
-        .map(|(n1, n2, w)| (n1.to_owned(), n2.to_owned(), w.unwrap()))
-        .collect();
-    edges.sort_by_key(|x| x.2);
+        .map(|(n1, n2, w)| (n1.to_string(), n2.to_string(), w.unwrap()))
+        .collect::<Vec<_>>();
+    edges.sort_unstable_by_key(|x| x.2);
 
-    let mut mst = Vec::<(String, String, EdgeWeight)>::new();
     let mut tree_id = HashMap::<String, usize>::new();
     for (i, node) in gr.get_nodes().iter().enumerate() {
         tree_id.insert(node.to_owned(), i);
     }
 
-    for edge in edges {
+    let mut mst = Vec::<EdgeWeighted>::new();
+    for edge in edges { // as?
         if tree_id[&edge.0] != tree_id[&edge.1] {
             let old_id = tree_id[&edge.0];
             let new_id = tree_id[&edge.1];
@@ -35,32 +35,33 @@ pub fn kruskal(gr: &Graph) -> Result<Vec<(String, String, EdgeWeight)>, GraphErr
     Ok(mst)
 }
 
-pub fn prim(gr: &Graph) -> Result<Vec<(String, String, EdgeWeight)>, GraphError> {
+pub fn prim(gr: &Graph) -> GraphResult<Vec<EdgeWeighted>> {
     check_if_applicable(gr)?;
 
-    let mut mst = Vec::<(String, String, EdgeWeight)>::new();
+    let mut mst = Vec::<EdgeWeighted>::new();
     let mut used_nodes = HashSet::<String>::new();
-    let mut available_edges = HashSet::<(String, String, EdgeWeight)>::new();
+    let mut available_edges = HashSet::<EdgeWeighted>::new();
 
     let mut not_used_nodes = HashSet::<String>::from_iter(gr.get_nodes());
-    if let Some(start_element) = not_used_nodes.clone().iter().next() {
-        not_used_nodes.remove(start_element);
-        used_nodes.insert(start_element.to_owned());
-        for connection in &gr.get_adjacency_list()[start_element] {
-            available_edges.insert((
-                start_element.to_owned(),
-                connection.0.to_owned(),
-                connection.1.unwrap(),
-            ));
-        }
-    } else {
+    if not_used_nodes.is_empty() {
         return Err(GraphError {
             msg: "Graph is empty".to_string(),
         });
-    };
+    }
+
+    let start_element: String = not_used_nodes.iter().next().unwrap().clone();
+    for (to, weight) in gr.get_adjacency_list()[&start_element].iter() {
+        available_edges.insert((
+            start_element.to_string(),
+            to.to_string(),
+            weight.unwrap(),
+        ));
+    }
+    not_used_nodes.remove(&start_element);
+    used_nodes.insert(start_element);
 
     while !not_used_nodes.is_empty() {
-        let mut next_connection: Option<(String, String, EdgeWeight)> = None;
+        let mut next_connection: Option<EdgeWeighted> = None;
         for edge in available_edges.iter() {
             if !used_nodes.contains(&edge.1)
                 && (next_connection.is_none()
@@ -69,7 +70,7 @@ pub fn prim(gr: &Graph) -> Result<Vec<(String, String, EdgeWeight)>, GraphError>
                 next_connection = Some(edge.to_owned());
             }
         }
-        let next_connection = next_connection.ok_or(GraphError {
+        let next_connection = next_connection.ok_or_else(|| GraphError {
             msg: "Found isolated node!".to_string(),
         })?;
         let new_node = next_connection.1.clone();
@@ -91,7 +92,7 @@ pub fn prim(gr: &Graph) -> Result<Vec<(String, String, EdgeWeight)>, GraphError>
     Ok(mst)
 }
 
-fn check_if_applicable(gr: &Graph) -> Result<(), GraphError> {
+fn check_if_applicable(gr: &Graph) -> GraphResult<()> {
     if !gr.is_weighted() {
         Err(GraphError {
             msg: "Graph has to be weighted".to_string(),
