@@ -7,6 +7,7 @@ fn main() -> InquireResult<()> {
     const TASK1A2: &str = "Ia. Find nodes which are adjacent from u and v";
     const TASK1B: &str = "Ib. Inverse oriented graph";
     const TASK21: &str = "II. Find strongly connected component in oriented graph";
+    const TASK22: &str = "II. Find shortest path from given node to others";
     const TASK3KRUSKAL: &str = "III. Find MST using Kruskal algorithm";
     const TASK3PRIM: &str = "III. Find MST using Prim algorithm";
     const HELPER_DFS: &str = "Get DFS from certain node";
@@ -17,6 +18,7 @@ fn main() -> InquireResult<()> {
         TASK1A2,
         TASK1B,
         TASK21,
+        TASK22,
         TASK3KRUSKAL,
         TASK3PRIM,
         HELPER_DFS,
@@ -167,14 +169,17 @@ fn main() -> InquireResult<()> {
                             Err(e) => safe_err!("{}", e),
                         };
                         print!("\nGraph has been inverted!\n")
-                    },
-                    TASK21 => {
-                        match tasks::task2::solve21(&gr) {
-                            Ok(c) => {
-                                print!("\n{:?}\n", c)
-                            },
-                            Err(e) => safe_err!("{}", e),
+                    }
+                    TASK21 => match tasks::task2::solve21(&gr) {
+                        Ok(c) => {
+                            print!("\n{:?}\n", c)
                         }
+                        Err(e) => safe_err!("{}", e),
+                    },
+                    TASK22 => {
+                        let s = or_escape!(Select::new("From where:", gr.get_nodes()).prompt());
+                        let paths = tasks::task2::solve22(&gr, s);
+                        print!("\n{paths:?}\n");
                     }
                     HELPER_DFS => {
                         let s = or_escape!(Select::new("Where to start:", gr.get_nodes()).prompt());

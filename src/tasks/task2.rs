@@ -21,11 +21,11 @@ pub fn solve21(gr: &Graph) -> GraphResult<HashSet<BTreeSet<String>>> {
         if component.is_empty() {
             component.insert(cur_node.to_string());
         }
-        
-        let mut connections = al[cur_node].iter().map(|(k, _)| k.to_string()).collect::<Vec<_>>();
-        connections.sort();
 
-        for node in &connections {
+        let mut connections = al[cur_node].keys().collect::<Vec<_>>();
+        connections.sort_unstable();
+
+        for node in connections {
             if !visited.contains(node) && node != cur_node {
                 find_component(al, lead, component, visited, node);
             }
@@ -55,4 +55,42 @@ pub fn solve21(gr: &Graph) -> GraphResult<HashSet<BTreeSet<String>>> {
     }
 
     Ok(components)
+}
+
+/// Find shortest in terms of number of edges paths to each node from given one
+pub fn solve22(gr: &Graph, start: String) -> HashMap<String, Vec<String>> {
+    fn find_shortest_paths(
+        al: &HashMap<String, HashMap<String, Option<EdgeWeight>>>,
+        cur_node: &String,
+        mut cur_path: Vec<String>,
+        paths: &mut HashMap<String, Vec<String>>,
+    ) -> HashMap<String, Vec<String>> {
+        cur_path.push(cur_node.to_string());
+
+        if paths[cur_node].is_empty() || cur_path.len() < paths[cur_node].len() {
+            paths.insert(cur_node.to_string(), cur_path.to_owned());
+        }
+
+        let mut connections = al[cur_node].keys().collect::<Vec<_>>();
+        connections.sort_unstable();
+
+        for node in connections {
+            if node != cur_node && !cur_path.contains(node) {
+                find_shortest_paths(al, node, cur_path.clone(), paths);
+            }
+        }
+
+        paths.to_owned()
+    }
+
+    let mut paths = HashMap::<String, Vec<String>>::new();
+    gr.get_nodes().into_iter().for_each(|node| {
+        paths.insert(node, Vec::new());
+    });
+    find_shortest_paths(
+        &gr.get_adjacency_list(),
+        &start,
+        Vec::<String>::new(),
+        &mut paths,
+    )
 }

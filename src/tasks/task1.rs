@@ -53,8 +53,8 @@ pub fn solve1b(gr: &Graph) -> GraphResult<Graph> {
     for node in gr.get_nodes() {
         inverted_gr.push_node(node)?;
     }
-    for edge in gr.get_edges() {
-        inverted_gr.push_edge(edge.1, edge.0, edge.2)?;
+    for (from, to, weight) in gr.get_edges() {
+        inverted_gr.push_edge(from, to, weight)?;
     }
     
     Ok(inverted_gr)
