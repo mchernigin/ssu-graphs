@@ -18,7 +18,7 @@ pub fn kruskal(gr: &Graph) -> GraphResult<Vec<EdgeWeighted>> {
     }
 
     let mut mst = Vec::<EdgeWeighted>::new();
-    for edge in edges { // as?
+    for edge in edges {
         if tree_id[&edge.0] != tree_id[&edge.1] {
             let old_id = tree_id[&edge.0];
             let new_id = tree_id[&edge.1];

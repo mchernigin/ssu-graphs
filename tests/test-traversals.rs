@@ -31,7 +31,7 @@ mod tests {
     fn test_bfs1() -> GraphResult<()> {
         let gr = Graph::from_file("graphs/tests/traversals/traversal1.gr".to_string())?;
         let bfs = algorithms::traversals::bfs(&gr, "A".to_string());
-        assert_eq!(bfs, vec!["E", "F", "B", "G", "H", "C", "J", "K", "D", "A"]);
+        assert_eq!(bfs, vec!["A", "B", "C", "D", "E", "F", "G", "H", "J", "K"]);
         Ok(())
     }
     
@@ -39,7 +39,7 @@ mod tests {
     fn test_bfs2() -> GraphResult<()> {
         let gr = Graph::from_file("graphs/tests/traversals/traversal2.gr".to_string())?;
         let bfs = algorithms::traversals::bfs(&gr, "A".to_string());
-        assert_eq!(bfs, vec!["J", "K", "D", "C", "E", "F", "B", "A"]);
+        assert_eq!(bfs, vec!["A", "B", "C", "D", "E", "F", "J", "K"]);
         Ok(())
     }
     
@@ -47,7 +47,7 @@ mod tests {
     fn test_bfs3() -> GraphResult<()> {
         let gr = Graph::from_file("graphs/tests/traversals/traversal3.gr".to_string())?;
         let bfs = algorithms::traversals::bfs(&gr, "A".to_string());
-        assert_eq!(bfs, vec!["K", "D", "J", "H", "C", "G", "F", "E", "B", "A"]);
+        assert_eq!(bfs, vec!["A", "B", "C", "D", "E", "F", "G", "H", "J", "K"]);
         Ok(())
     }
 }

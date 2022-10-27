@@ -1,0 +1,13 @@
+not weighted oriented
+A: B, D, E, J
+B: C
+C: A
+D: A
+E: F 
+F: G
+G: H 
+H: A 
+J: K
+K: L
+L: M 
+M: J
