@@ -10,8 +10,10 @@ fn main() -> InquireResult<()> {
     const TASK22: &str = "II. Find shortest path from given node to others";
     const TASK3KRUSKAL: &str = "III. Find MST using Kruskal algorithm";
     const TASK3PRIM: &str = "III. Find MST using Prim algorithm";
+    const TASK4A: &str = "IV. Find shortest paths for every pair of nodes";
     const HELPER_DFS: &str = "Get DFS from certain node";
     const HELPER_BFS: &str = "Get BFS from certain node";
+    const HELPER_DIJKSTRA: &str = "Find shortest paths from one node to others using Dijkstra algorithm";
 
     let tasks = vec![
         TASK1A1,
@@ -21,8 +23,10 @@ fn main() -> InquireResult<()> {
         TASK22,
         TASK3KRUSKAL,
         TASK3PRIM,
+        TASK4A,
         HELPER_DFS,
         HELPER_BFS,
+        HELPER_DIJKSTRA,
     ];
     print!("\x1B[2J\x1B[1;1H"); // clear the console
     let graph_creation_ans = or_err!(Select::new(
@@ -166,7 +170,7 @@ fn main() -> InquireResult<()> {
                     TASK1B => {
                         match tasks::task1::solve1b(&gr) {
                             Ok(new_gr) => gr = new_gr,
-                            Err(e) => safe_err!("{}", e),
+                            Err(e) => safe_err!("{e}"),
                         };
                         print!("\nGraph has been inverted!\n")
                     }
@@ -174,7 +178,7 @@ fn main() -> InquireResult<()> {
                         Ok(c) => {
                             print!("\n{:?}\n", c)
                         }
-                        Err(e) => safe_err!("{}", e),
+                        Err(e) => safe_err!("{e}"),
                     },
                     TASK22 => {
                         let s = or_escape!(Select::new("From where:", gr.get_nodes()).prompt());
@@ -191,6 +195,28 @@ fn main() -> InquireResult<()> {
                             }
                         }
                     }
+                    TASK4A => {
+                        let nodes = gr.get_nodes();
+                        let res = tasks::task4::solve4a(&gr);
+                        if let Err(e) = &res {
+                            safe_err!("{e}\n");
+                            continue;
+                        }
+                        let res = res.unwrap();
+                        for start in &nodes {
+                            let paths = &res[start];
+                            for node in &nodes {
+                                if start == node {
+                                    continue;
+                                }
+                                let (weight, path) = &paths[node];
+                                match weight {
+                                    Some(w) => println!("{start} to {node}: {} weights {w}", path.join(" -> ")),
+                                    None => println!("{start} to {node}: Unreachable"),
+                                }
+                            }
+                        }
+                    }
                     HELPER_DFS => {
                         let s = or_escape!(Select::new("Where to start:", gr.get_nodes()).prompt());
                         print!("\n{:?}\n", algorithms::traversals::dfs(&gr, s));
@@ -198,6 +224,23 @@ fn main() -> InquireResult<()> {
                     HELPER_BFS => {
                         let s = or_escape!(Select::new("Where to start:", gr.get_nodes()).prompt());
                         print!("\n{:?}\n", algorithms::traversals::bfs(&gr, s));
+                    }
+                    HELPER_DIJKSTRA => {
+                        let nodes = gr.get_nodes();
+                        let start = or_escape!(Select::new("Start:", nodes.clone()).prompt());
+                        let res = algorithms::weighted::dijkstra_convenient(&gr, start.clone());
+                        if let Err(e) = &res {
+                            safe_err!("{e}\n");
+                            continue;
+                        }
+                        let paths = res.unwrap();
+                        for node in nodes {
+                            let (weight, path) = &paths[&node];
+                            match weight {
+                                Some(w) => println!("{}: {} weights {}", node, path.join(" -> "), w),
+                                None => println!("{}: Unreachable from {}", node, start),
+                            }
+                        }
                     }
                     _ => safe_err!("Unknown algorithm"),
                 }
