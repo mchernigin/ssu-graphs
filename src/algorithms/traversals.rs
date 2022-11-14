@@ -40,7 +40,7 @@ pub fn bfs(gr: &Graph, start: String) -> Vec<String> {
 
         let mut connections = al[cur_node].keys().collect::<Vec<_>>();
         connections.sort_unstable();
-        
+
         for node in connections {
             if !visited.contains(node) {
                 bfs_inner(al, visited, path, node);

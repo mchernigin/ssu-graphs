@@ -161,9 +161,9 @@ impl Graph {
 
             let mut connections: HashMap<String, Option<EdgeWeight>> = HashMap::new();
             for c in connections_str
-                .split(",")
+                .split(',')
                 .map(|c| c.trim())
-                .filter(|c| *c != "")
+                .filter(|c| !c.is_empty())
             {
                 if !is_weighted {
                     connections.insert(c.to_string(), None);
@@ -214,7 +214,7 @@ impl Graph {
         for node in self.get_nodes() {
             al.push_str(&format!("\n{}: ", &node));
             for (connection, weight) in &self.adjacency_list[&node] {
-                al.push_str(&connection);
+                al.push_str(connection);
                 if let Some(w) = weight {
                     al.push_str(&format!("({})", &w.to_string()));
                 }
@@ -372,7 +372,7 @@ impl Graph {
 
         if node1_connections.insert(node2.clone(), weight).is_some() {
             return Err(GraphError {
-                msg: format!("Nodes are already connected"),
+                msg: "Nodes are already connected".to_string(),
             });
         }
 
@@ -394,9 +394,12 @@ impl Graph {
             });
         }
 
-        let node1_connection = self.adjacency_list.get_mut(&node1).ok_or_else(|| GraphError {
-            msg: format!("Node {node1:?} does not exist"),
-        })?;
+        let node1_connection = self
+            .adjacency_list
+            .get_mut(&node1)
+            .ok_or_else(|| GraphError {
+                msg: format!("Node {node1:?} does not exist"),
+            })?;
 
         let rv = node1_connection.remove(&node2).ok_or_else(|| GraphError {
             msg: "There is no such connection".to_string(),

@@ -4,7 +4,7 @@ use crate::*;
 pub fn solve1a1(gr: &Graph, u: String, v: String) -> GraphResult<Vec<String>> {
     let al = gr.get_adjacency_list();
     check_if_contains(gr, &u, &v)?;
-    
+
     Ok(gr
         .get_nodes()
         .into_iter()
@@ -16,7 +16,7 @@ pub fn solve1a1(gr: &Graph, u: String, v: String) -> GraphResult<Vec<String>> {
 pub fn solve1a2(gr: &Graph, u: String, v: String) -> GraphResult<Vec<String>> {
     let al = gr.get_adjacency_list();
     check_if_contains(gr, &u, &v)?;
-    
+
     Ok(gr
         .get_nodes()
         .into_iter()
@@ -36,7 +36,7 @@ fn check_if_contains(gr: &Graph, u: &String, v: &String) -> GraphResult<()> {
             msg: format!("Node v {v:?} does not exist"),
         });
     }
-    
+
     Ok(())
 }
 
@@ -49,13 +49,13 @@ pub fn solve1b(gr: &Graph) -> GraphResult<Graph> {
     }
 
     let mut inverted_gr = Graph::new(gr.is_weighted(), gr.is_oriented());
-    
+
     for node in gr.get_nodes() {
         inverted_gr.push_node(node)?;
     }
     for (from, to, weight) in gr.get_edges() {
         inverted_gr.push_edge(from, to, weight)?;
     }
-    
+
     Ok(inverted_gr)
 }

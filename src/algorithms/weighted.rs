@@ -11,7 +11,9 @@ struct Weighted {
 
 impl Ord for Weighted {
     fn cmp(&self, other: &Self) -> Ordering {
-        other.cost.cmp(&self.cost)
+        other
+            .cost
+            .cmp(&self.cost)
             .then_with(|| self.node.cmp(&other.node))
     }
 }
@@ -22,9 +24,17 @@ impl PartialOrd for Weighted {
     }
 }
 
-pub fn dijkstra(gr: &Graph, start: String) -> GraphResult<(HashMap<String, Option<u32>>, HashMap<String, Option<String>>)> {
+pub fn dijkstra(
+    gr: &Graph,
+    start: String,
+) -> GraphResult<(
+    HashMap<String, Option<u32>>,
+    HashMap<String, Option<String>>,
+)> {
     if !gr.is_weighted() {
-        return Err(GraphError { msg: "Graph has to be weighted".to_string() });
+        return Err(GraphError {
+            msg: "Graph has to be weighted".to_string(),
+        });
     }
 
     let al = gr.get_adjacency_list();
@@ -35,7 +45,10 @@ pub fn dijkstra(gr: &Graph, start: String) -> GraphResult<(HashMap<String, Optio
     dist.insert(start.clone(), Some(0));
 
     let mut front = BinaryHeap::new();
-    front.push(Weighted {node: start.clone(), cost: 0});
+    front.push(Weighted {
+        node: start.clone(),
+        cost: 0,
+    });
 
     for node in nodes {
         prev.insert(node.clone(), None);
@@ -56,7 +69,10 @@ pub fn dijkstra(gr: &Graph, start: String) -> GraphResult<(HashMap<String, Optio
             if dist[neighbor].is_none() || alt < dist[neighbor].unwrap() {
                 *dist.get_mut(neighbor).unwrap() = Some(alt);
                 *prev.get_mut(neighbor).unwrap() = Some(u.clone());
-                front.push(Weighted {node: neighbor.clone(), cost: alt});
+                front.push(Weighted {
+                    node: neighbor.clone(),
+                    cost: alt,
+                });
             }
         }
     }
@@ -64,10 +80,13 @@ pub fn dijkstra(gr: &Graph, start: String) -> GraphResult<(HashMap<String, Optio
     Ok((dist, prev))
 }
 
-pub fn dijkstra_convenient(gr: &Graph, start: String) -> GraphResult<HashMap<String, (Option<u32>, Vec<String>)>> {
+pub fn dijkstra_convenient(
+    gr: &Graph,
+    start: String,
+) -> GraphResult<HashMap<String, (Option<u32>, Vec<String>)>> {
     let mut dijkstra_result = HashMap::new();
     let nodes = gr.get_nodes();
-    let (dist, prev) = algorithms::weighted::dijkstra(&gr, start.clone())?;
+    let (dist, prev) = algorithms::weighted::dijkstra(gr, start)?;
     for node in nodes {
         let mut path = VecDeque::new();
         let mut n = Some(node.clone());
@@ -80,3 +99,6 @@ pub fn dijkstra_convenient(gr: &Graph, start: String) -> GraphResult<HashMap<Str
     Ok(dijkstra_result)
 }
 
+pub fn floyd(gr: &Graph, start: String) {
+    todo!();
+}

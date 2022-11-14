@@ -18,13 +18,13 @@ pub fn kruskal(gr: &Graph) -> GraphResult<Vec<EdgeWeighted>> {
     }
 
     let mut mst = Vec::<EdgeWeighted>::new();
-    for edge in edges { // as?
+    for edge in edges {
         if tree_id[&edge.0] != tree_id[&edge.1] {
             let old_id = tree_id[&edge.0];
             let new_id = tree_id[&edge.1];
-            for (node, parent) in tree_id.to_owned() {
-                if parent == old_id {
-                    tree_id.insert(node, new_id);
+            for (node, parent) in tree_id.clone().iter() {
+                if *parent == old_id {
+                    tree_id.insert(node.to_string(), new_id);
                 }
             }
 
@@ -51,11 +51,7 @@ pub fn prim(gr: &Graph) -> GraphResult<Vec<EdgeWeighted>> {
 
     let start_element: String = not_used_nodes.iter().next().unwrap().clone();
     for (to, weight) in gr.get_adjacency_list()[&start_element].iter() {
-        available_edges.insert((
-            start_element.to_string(),
-            to.to_string(),
-            weight.unwrap(),
-        ));
+        available_edges.insert((start_element.to_string(), to.to_string(), weight.unwrap()));
     }
     not_used_nodes.remove(&start_element);
     used_nodes.insert(start_element);

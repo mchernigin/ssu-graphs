@@ -10,10 +10,11 @@ fn main() -> InquireResult<()> {
     const TASK22: &str = "II. Find shortest path from given node to others";
     const TASK3KRUSKAL: &str = "III. Find MST using Kruskal algorithm";
     const TASK3PRIM: &str = "III. Find MST using Prim algorithm";
-    const TASK4A: &str = "IV. Find shortest paths for every pair of nodes";
+    const TASK4A: &str = "IVa. Find shortest paths for every pair of nodes";
+    const TASK4B: &str = "IVb. Find shortest paths from u to others.";
     const HELPER_DFS: &str = "Get DFS from certain node";
     const HELPER_BFS: &str = "Get BFS from certain node";
-    const HELPER_DIJKSTRA: &str = "Find shortest paths from one node to others using Dijkstra algorithm";
+    const HELPER_DIJKSTRA: &str = "Find shortest paths from one node to others using Dijkstra";
 
     let tasks = vec![
         TASK1A1,
@@ -24,6 +25,7 @@ fn main() -> InquireResult<()> {
         TASK3KRUSKAL,
         TASK3PRIM,
         TASK4A,
+        TASK4B,
         HELPER_DFS,
         HELPER_BFS,
         HELPER_DIJKSTRA,
@@ -141,7 +143,7 @@ fn main() -> InquireResult<()> {
                              v| match f(&gr, u, v) {
                     Ok(v) => print!(
                         "\n{}\n",
-                        if v.len() > 0 {
+                        if !v.is_empty() {
                             v.iter()
                                 .map(|t| format!("{t:?}"))
                                 .collect::<Vec<String>>()
@@ -211,11 +213,18 @@ fn main() -> InquireResult<()> {
                                 }
                                 let (weight, path) = &paths[node];
                                 match weight {
-                                    Some(w) => println!("{start} to {node}: {} weights {w}", path.join(" -> ")),
+                                    Some(w) => println!(
+                                        "{start} to {node}: {} weights {w}",
+                                        path.join(" -> ")
+                                    ),
                                     None => println!("{start} to {node}: Unreachable"),
                                 }
                             }
                         }
+                    }
+                    TASK4B => {
+                        // let u = or_escape!(Select::new("Where to start:", gr.get_nodes()).prompt());
+                        todo!();
                     }
                     HELPER_DFS => {
                         let s = or_escape!(Select::new("Where to start:", gr.get_nodes()).prompt());
@@ -237,7 +246,9 @@ fn main() -> InquireResult<()> {
                         for node in nodes {
                             let (weight, path) = &paths[&node];
                             match weight {
-                                Some(w) => println!("{}: {} weights {}", node, path.join(" -> "), w),
+                                Some(w) => {
+                                    println!("{}: {} weights {}", node, path.join(" -> "), w)
+                                }
                                 None => println!("{}: Unreachable from {}", node, start),
                             }
                         }
