@@ -130,11 +130,62 @@ pub fn floyd(gr: &Graph) -> GraphResult<HashMap<String, HashMap<String, Option<E
                 let maybe_new_weight = am[i][k].unwrap() + am[k][j].unwrap();
                 if am[i][j].is_none() || am[i][j].is_some() && maybe_new_weight < am[i][j].unwrap()
                 {
-                    am.get_mut(i).unwrap().insert(j.to_string(), Some(maybe_new_weight));
+                    am.get_mut(i)
+                        .unwrap()
+                        .insert(j.to_string(), Some(maybe_new_weight));
                 }
             }
         }
     }
 
     Ok(am)
+}
+
+// Bellman Ford indeed
+pub fn find_negative_cycle(gr: &Graph, u: String) -> GraphResult<Vec<String>> {
+    if !gr.is_weighted() {
+        return Err(GraphError {
+            msg: "Graph has to be weighted".to_string(),
+        });
+    }
+
+    let mut path_weights = HashMap::new();
+    let mut parent = HashMap::new();
+    parent.insert(u.to_string(), u.to_string());
+    let nodes = gr.get_nodes();
+    for node in &nodes {
+        path_weights.insert(node.to_string(), None);
+    }
+    path_weights.insert(u, Some(0));
+
+    let edges = gr.get_edges();
+    let n = nodes.len();
+    for _ in 1..n - 1 {
+        for (from, to, weight) in &edges {
+            if path_weights[to].is_none() || weight < &path_weights[to] {
+                path_weights.insert(to.to_string(), *weight);
+                parent.insert(to.to_string(), from.to_string());
+            }
+        }
+    }
+    for (from, to, weight) in &edges {
+        if path_weights[from].is_none()
+            || weight.is_some()
+                && path_weights[to].unwrap() > path_weights[from].unwrap() + weight.unwrap()
+        {
+            let mut negative_cycle = Vec::new();
+            negative_cycle.push(from.to_string());
+            if !parent.contains_key(from) {
+                continue;
+            }
+            let mut p = &parent[from];
+            while p != from {
+                negative_cycle.push(p.to_string());
+                p = &parent[p];
+            }
+            return Ok(negative_cycle);
+        }
+    }
+
+    Ok(Vec::new())
 }

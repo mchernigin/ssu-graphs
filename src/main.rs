@@ -12,6 +12,7 @@ fn main() -> InquireResult<()> {
     const TASK3PRIM: &str = "III. Find MST using Prim algorithm";
     const TASK4A: &str = "IVa. Find shortest paths for every pair of nodes";
     const TASK4B: &str = "IVb. Find shortest paths from u to others.";
+    const TASK4C: &str = "IVc. Find negative cycle.";
     const HELPER_DFS: &str = "Get DFS from certain node";
     const HELPER_BFS: &str = "Get BFS from certain node";
     const HELPER_DIJKSTRA: &str = "Find shortest paths from one node to others using Dijkstra";
@@ -26,6 +27,7 @@ fn main() -> InquireResult<()> {
         TASK3PRIM,
         TASK4A,
         TASK4B,
+        TASK4C,
         HELPER_DFS,
         HELPER_BFS,
         HELPER_DIJKSTRA,
@@ -238,8 +240,26 @@ fn main() -> InquireResult<()> {
                             }
                             match weight {
                                 Some(w) => println!("{u:?} to {to:?} weights {w}"),
-                                None => println!("Cannot get from {u:?} to {to:?}")
+                                None => println!("Cannot get from {u:?} to {to:?}"),
                             }
+                        }
+                    }
+                    TASK4C => {
+                        let mut v = match algorithms::weighted::find_negative_cycle(
+                            &gr,
+                            gr.get_nodes()[0].clone(),
+                        ) {
+                            Ok(v) => v,
+                            Err(e) => {
+                                safe_err!("{e}\n");
+                                continue;
+                            }
+                        };
+                        if v.is_empty() {
+                            println!("No negative cycle!")
+                        } else {
+                            v.reverse();
+                            println!("Found negative cycle: {}", v.join(" -> "));
                         }
                     }
                     HELPER_DFS => {
