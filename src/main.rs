@@ -223,8 +223,24 @@ fn main() -> InquireResult<()> {
                         }
                     }
                     TASK4B => {
-                        // let u = or_escape!(Select::new("Where to start:", gr.get_nodes()).prompt());
-                        todo!();
+                        let u = or_escape!(Select::new("Where to start:", gr.get_nodes()).prompt());
+                        let am = match algorithms::weighted::floyd(&gr) {
+                            Ok(am) => am,
+                            Err(e) => {
+                                safe_err!("{e}\n");
+                                continue;
+                            }
+                        };
+                        let from_u_weights = &am[&u];
+                        for (to, weight) in from_u_weights {
+                            if to == &u {
+                                continue;
+                            }
+                            match weight {
+                                Some(w) => println!("{u:?} to {to:?} weights {w}"),
+                                None => println!("Cannot get from {u:?} to {to:?}")
+                            }
+                        }
                     }
                     HELPER_DFS => {
                         let s = or_escape!(Select::new("Where to start:", gr.get_nodes()).prompt());

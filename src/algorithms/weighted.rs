@@ -99,6 +99,42 @@ pub fn dijkstra_convenient(
     Ok(dijkstra_result)
 }
 
-pub fn floyd(gr: &Graph, start: String) {
-    todo!();
+pub fn floyd(gr: &Graph) -> GraphResult<HashMap<String, HashMap<String, Option<EdgeWeight>>>> {
+    if !gr.is_weighted() {
+        return Err(GraphError {
+            msg: "Graph has to be weighted".to_string(),
+        });
+    }
+
+    let nodes = gr.get_nodes();
+    let mut am = HashMap::new();
+    for from in &nodes {
+        let mut paths_from = HashMap::new();
+        for to in &nodes {
+            paths_from.insert(to.to_string(), None);
+        }
+        am.insert(from.to_string(), paths_from);
+    }
+    let edges = gr.get_edges();
+    for (from, to, weight) in edges {
+        am.get_mut(&from).unwrap().insert(to, weight);
+    }
+
+    for k in &nodes {
+        for i in &nodes {
+            for j in &nodes {
+                if am[i][k].is_none() || am[k][j].is_none() {
+                    continue;
+                }
+
+                let maybe_new_weight = am[i][k].unwrap() + am[k][j].unwrap();
+                if am[i][j].is_none() || am[i][j].is_some() && maybe_new_weight < am[i][j].unwrap()
+                {
+                    am.get_mut(i).unwrap().insert(j.to_string(), Some(maybe_new_weight));
+                }
+            }
+        }
+    }
+
+    Ok(am)
 }
