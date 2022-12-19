@@ -13,6 +13,7 @@ fn main() -> InquireResult<()> {
     const TASK4A: &str = "IVa. Find shortest paths for every pair of nodes";
     const TASK4B: &str = "IVb. Find shortest paths from u to others.";
     const TASK4C: &str = "IVc. Find negative cycle.";
+    const EDMONDS_KARP: &str = "V. Find maximum flow using Edmonds–Karp algorithm";
     const HELPER_DFS: &str = "Get DFS from certain node";
     const HELPER_BFS: &str = "Get BFS from certain node";
     const HELPER_DIJKSTRA: &str = "Find shortest paths from one node to others using Dijkstra";
@@ -28,6 +29,7 @@ fn main() -> InquireResult<()> {
         TASK4A,
         TASK4B,
         TASK4C,
+        EDMONDS_KARP,
         HELPER_DFS,
         HELPER_BFS,
         HELPER_DIJKSTRA,
@@ -260,6 +262,17 @@ fn main() -> InquireResult<()> {
                         } else {
                             v.reverse();
                             println!("Found negative cycle: {}", v.join(" -> "));
+                        }
+                    }
+                    EDMONDS_KARP => {
+                        let s = or_escape!(Select::new("Pick source:", gr.get_nodes()).prompt());
+                        let t = or_escape!(Select::new("Pick sink:", gr.get_nodes()).prompt());
+                        match algorithms::weighted::edmonds_karp(&mut gr, s, t) {
+                            Ok(res) => println!("{}", res),
+                            Err(e) => {
+                                safe_err!("{e}\n");
+                                continue;
+                            }
                         }
                     }
                     HELPER_DFS => {

@@ -1,3 +1,4 @@
+use crate::tasks::task2::solve22;
 use crate::*;
 
 use std::cmp::Ordering;
@@ -188,4 +189,33 @@ pub fn find_negative_cycle(gr: &Graph, u: String) -> GraphResult<Vec<String>> {
     }
 
     Ok(Vec::new())
+}
+
+pub fn edmonds_karp(gr: &Graph, source: String, sink: String) -> GraphResult<i32> {
+    if !gr.is_weighted() {
+        return Err(GraphError {
+            msg: "Graph has to be weighted".to_string(),
+        });
+    }
+
+    let mut alg_gr = gr.clone();
+    let mut max_flow = 0;
+    while let Some(path) = solve22(&alg_gr, source.clone()).get(&sink) {
+        if path.is_empty() {
+            break;
+        }
+        let al = alg_gr.get_adjacency_list();
+        let mut path_flow = i32::MAX;
+        let mut weakest = ("".to_string(), "".to_string());
+        for i in 1..path.len() {
+            if al[&path[i - 1]][&path[i]].unwrap() < path_flow {
+                path_flow = al[&path[i - 1]][&path[i]].unwrap();
+                weakest = (path[i - 1].clone(), path[i].clone());
+            }
+        }
+        alg_gr.pop_edge(weakest.0, weakest.1)?;
+        max_flow += path_flow;
+    }
+
+    Ok(max_flow)
 }
