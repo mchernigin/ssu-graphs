@@ -313,12 +313,15 @@ impl Graph {
 
     /// Add new node to the graph.
     pub fn push_node(&mut self, name: String) -> GraphResult<String> {
-        match self.adjacency_list.insert(name.clone(), HashMap::new()) {
-            Some(_) => Err(GraphError {
+        if self.adjacency_list.contains_key(&name) {
+            return Err(GraphError {
                 msg: format!("Node {name:?} already exists"),
-            }),
-            None => Ok(name),
+            });
         }
+
+        self.adjacency_list.insert(name.clone(), HashMap::new());
+
+        Ok(name)
     }
 
     /// Remove node from the graph.
